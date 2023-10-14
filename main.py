@@ -1,14 +1,15 @@
 from diffusers import StableDiffusionPipeline
 import torch
-import tensorflow as tf
 from deep_translator import GoogleTranslator
-from matplotlib import pyplot as plt
-from matplotlib import image as mpimg
+import gradio as gr
+import os
 
 
 def get_by_prompt(prompt, height=800, width=800):
+    # Перевод на английский для нормального взаимодействия с моделями
+    translated_prompt = GoogleTranslator(source='auto', target='ru').translate(prompt)
     images = pipe(
-        prompt=prompt,
+        prompt=translated_prompt,
         height=height,
         width=width,
         num_inference_steps=100,
@@ -24,10 +25,13 @@ if __name__ == '__main__':
     pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
     pipe = pipe.to("cuda")
     # Здесь будет получение данных с формы
-    user_prompt = "мой временный промпт"
 
-    # Перевод на английский для нормального взаимодействия с моделями
-    translated_prompt = GoogleTranslator(source='auto', target='ru').translate(user_prompt)
-    ready_images = get_by_prompt(translated_prompt)
-    plt.imshow(ready_images[0])
-    plt.show()
+    with gr.Blocks() as demo:
+        txt = gr.Textbox(label="Описание вашего будущего превью", lines=2)
+        btn = gr.Button(value="Сгенерировать превью")
+        out_img = gr.Image(label="Результат")
+        btn.click(get_by_prompt(txt)[0], inputs=[txt], outputs=[out_img])
+
+        with gr.Row():
+            im = gr.Image()
+            im_2 = gr.Image()
