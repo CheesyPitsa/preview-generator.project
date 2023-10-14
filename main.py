@@ -27,8 +27,7 @@ with gr.Blocks() as demo:
 
 if __name__ == "__main__":
     # Подгрузка модельки dreamlike
-    # model_id = "dreamlike-art/dreamlike-diffusion-1.0"
-    model_id = "prompthero/openjourney"
+    model_id = "dreamlike-art/dreamlike-diffusion-1.0"
     pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
     pipe = pipe.to("cuda")
     demo.launch()
